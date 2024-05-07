@@ -5,94 +5,87 @@
   <base href="{{ baseHref }}">
   <meta charset="utf-8">
   <title>{% block title %}Index{% endblock %} - Mongo Express</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <link href="{{ baseHref }}public/css/style.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
   <link rel="prefetch" href="{{ baseHref }}public/img/gears.gif">
 
   {% block styles %}{% endblock %}
 </head>
 
-<body>
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
-      <div class="container">
-        <div class="d-flex justify-content-start align-items-center">
-          <div class="logo-nav">
-            <a href="{{ baseHref }}">
-              <img src="{{ baseHref }}public/img/mongo-express-logo.png" />
-            </a>
-          </div>
-          <a class="navbar-brand" href="">Mongo Express</a>
-        </div>
-        <div>
-          <ul class="nav navbar-nav">
-            {% block navigation %}
-            {% endblock %}
-          </ul>
-        </div>
-        <!--/.nav-collapse -->
+<body class="pb-3">
+
+<nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-light sticky-top p-0">
+  <div class="{% if settings.fullwidth_layout %}container-fluid{% else %}container{% endif %}">
+    <a class="navbar-brand" href="{{ baseHref }}">
+      <img src="{{ baseHref }}public/img/mongo-express-logo.png" width="30" height="30" class="d-inline-block align-top" alt="" />
+      Mongo Express
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto">
+        {% block breadcrumb %}
+        {% endblock %}
+      </ul>
+      <div class="dark-mode-toggle">
+        <i id="darkModeIcon" class="fa fa-moon"></i>
       </div>
-    </nav>
-  </header>
-
-  <main>
-    <div class="container">
-      <nav aria-label="breadcrumb" class="mb-5">
-        <ol class="breadcrumb">
-          {% block breadcrumb %}
-          {% endblock %}
-        </ol>
-      </nav>
-
-      {% if title %}
-      <p id="pageTitle" class="text-muted font-weight-bold text-uppercase small mb-4">{{ title }}</p>
-      {% endif %}
-
-      {% if messageSuccess %}
-      <div class="alert alert-success">
-        <strong>{{ messageSuccess }}</strong>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      {% endif %}
-
-      {% if messageError %}
-      <div class="alert alert-danger">
-        <strong>{{ messageError }}</strong>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      {% endif %}
-
-      {% block content %}
-      {% endblock %}
     </div>
-  </main>
+  </div>
+</nav>
 
 
+<div class="{% if settings.fullwidth_layout %}container-fluid{% else %}container{% endif %}">
+  <div>
+    <h1 id="pageTitle" class="pb-2 border-bottom border-dark">{{ title }}</h1>
 
-  <script src="{{ baseHref }}{{assets.vendor.js}}"></script>
-  <script type="text/javascript">
-    'use strict';
-    window.ME_SETTINGS = {
-      readOnly: '{{ !!settings.read_only }}' === 'true',
-      noDelete: '{{ !!settings.no_delete }}' === 'true',
-      codeMirrorEditorTheme: '{{ editorTheme }}',
-      baseHref: '{{ baseHref }}',
-      collapsibleJSON: '{{ !!settings.me_collapsible_json }}' === 'true',
-      collapsibleJSONDefaultUnfold: parseInt('{{ settings.me_collapsible_json_default_unfold || 0}}', 10),
-      confirmDelete: '{{ !!settings.me_confirm_delete }}' === 'true',
-      dbName: '{{ dbName | url_encode }}',
-      collectionName: '{{ collectionName | url_encode }}',
-      bucketName: '{{ bucketName }}'
-    };
-  </script>
-  {% block scripts %}
-  {% endblock %}
+    {% if messageSuccess %}
+    <div class="alert alert-success alert-dismissible" role="alert">
+      <strong>{{ messageSuccess }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if messageError %}
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      <strong>{{ messageError }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <div>
+    {% block content %}
+    {% endblock %}
+  </div>
+</div>
+
+<script src="{{ baseHref }}{{assets.vendor.js}}"></script>
+<script type="text/javascript">
+
+  window.ME_SETTINGS = {
+    readOnly: '{{ !!settings.read_only }}' === 'true',
+    noDelete: '{{ !!settings.no_delete }}' === 'true',
+    baseHref: '{{ baseHref }}',
+    collapsibleJSON: '{{ !!settings.me_collapsible_json }}' === 'true',
+    collapsibleJSONDefaultUnfold: Number.parseInt('{{ settings.me_collapsible_json_default_unfold || 0}}', 10),
+    confirmDelete: '{{ !!settings.me_confirm_delete }}' === 'true',
+    dbName: '{{ dbName | url_encode }}',
+    collectionName: '{{ collectionName | url_encode }}',
+    bucketName: '{{ bucketName }}',
+    limit: '{{ limit }}',
+    skip: '{{ skip }}',
+    totalPages: Math.ceil('{{ count }}' / '{{ limit }}')
+  };
+</script>
+{% block scripts %}
+{% endblock %}
 </body>
-
 </html>

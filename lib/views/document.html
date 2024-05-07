@@ -4,10 +4,6 @@
 
 
 {% block styles %}
-  <link href="{{ baseHref }}public/css/codemirror.css" rel="stylesheet">
-  {% if editorTheme != "default" %}
-  <link href="{{ baseHref }}public/css/theme/{{ editorTheme }}.css" rel="stylesheet">
-  {% endif %}
 
   <style type="text/css">
     .CodeMirror-scroll {
@@ -16,7 +12,6 @@
       overflow-x: auto;
       width: 100%;
     }
-    
     .CodeMirror {
       height: auto;
     }
@@ -24,99 +19,97 @@
 {% endblock %}
 
 
-{% block navigation %}
-<div class="dropdown show">
-  <a class="btn btn-secondary btn-sm dropdown-toggle" href="#" role="button" id="dropdownDatabase"
-    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Database: {{ dbName }}
-  </a>
-
-  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownDatabase">
-    {% for db in databases %}
-    <li class="dropdown-item">
-      <a href="{{ baseHref }}db/{{ db | url_encode }}/">{{ db }}</a>
-    </li>
-    {% endfor %}
-  </div>
-</div>
-
-<div class="dropdown show ml-1">
-  <a class="btn btn-secondary btn-sm dropdown-toggle" href="#" role="button" id="dropdownCollection"
-    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Collection: {{ collectionName }}
-  </a>
-
-  <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownCollection">
-    {% for collection in collections %}
-    <li class="dropdown-item">
-      <a href="{{ dbUrl }}/{{ collection | url_encode }}">{{ collection }}</a>
-    </li>
-    {% endfor %}
-  </div>
-</div>
-{% endblock %}
-
 {% block breadcrumb %}
-<li class="breadcrumb-item" aria-current="page"><a href="{{ baseHref }}">Overview</a></li>
-<li class="breadcrumb-item" aria-current="page"><a href="{{ dbUrl }}">{{ dbName }}</a></li>
-<li class="breadcrumb-item" aria-current="page"><a href="{{ dbUrl }}/{{ collectionName | url_encode }}">{{ collectionName }}</a></li>
-<li class="breadcrumb-item active" aria-current="page">{{ document._id|stringDocIDs }}</li>
+<li class="nav-item">
+  <a class="nav-link px-1" href="{{ dbUrl }}">Database:</a>
+</li>
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle px-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    {{ dbName }}
+  </a>
+  <ul class="dropdown-menu">
+    {% for db in databases %}
+    <a class="dropdown-item" href="{{ baseHref }}db/{{ db | url_encode }}/">{{ db }}</a>
+    {% endfor %}
+  </ul>
+</li>
+<li class="nav-item">
+  <a class="nav-link px-1" href="{{ collectionUrl }}">Collection:</a>
+</li>
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle px-1" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+    {{ collectionName }}
+  </a>
+  <ul class="dropdown-menu">
+    {% for collection in collections %}
+    <a class="dropdown-item" href="{{ dbUrl }}/{{ collection | url_encode }}">{{ collection }}</a>
+    {% endfor %}
+  </ul>
+</li>
+<li class="nav-item">
+  <a class="nav-link disabled">Document {{ document._id|stringDocIDs }}</a>
+</li>
 {% endblock %}
 
 {% block content %}
+
 {% if document._id._bsontype == 'Binary' %}
 <form method="POST"
   id="documentEditForm"
-  action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}?subtype={{ document._id.sub_type }}"
+  action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}?subtype={{ document._id.sub_type }}&skip={{skip}}"
+>
+{% elseif document._id._bsontype == 'Long' %}
+<form method="POST"
+  id="documentEditForm"
+  action="{{ collectionUrl }}/{{ document._id | longToString | safe | url_encode }}?skip={{skip}}"
 >
 {% else %}
 <form method="POST"
   id="documentEditForm"
-  action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}"
+  action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}?skip={{skip}}"
 >
 {% endif %}
-
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
   {% if docLength > 10 %}
-    <div class="d-flex justify-content-between align-items-center">
+    <div>
       {% if !settings.read_only %}
         <input type="hidden" name="_method" value="put">
-        <button onclick="return onBackClick()" class="backButton btn">
-         <i class="fas fa-arrow-left"></i>
+        <button onclick="return onBackClick()" class="backButton btn btn-warning btn-large">
+         <i class="fa fa-arrow-left"></i>
           Back
         </button>
-  
-        <button type="submit" class="btn btn-success" onclick="return onSubmitClick()">
-          <span class="glyphicon glyphicon-pencil"></span>
+        <button type="submit" class="btn btn-success btn-large float-end" onclick="return onSubmitClick()">
+          <i class="fa fa-save"></i>
           Save
         </button>
       {% else %}
-        <button onclick="return history.back()" class="btn">
-          <i class="fas fa-arrow-left"></i>
+        <button onclick="return history.back()" class="btn btn-warning btn-large btn-block">
+          <i class="fa fa-arrow-left"></i>
           Back
         </button>
       {% endif %}
     </div>
+  <br />
   {% endif %}
 
-  <div class="my-3">
-    <textarea id="document" name="document"{% if settings.read_only %} readonly="readonly"{% endif %}>{{ docString }}</textarea>
-  </div>
+  <textarea class="col-md-12" id="document" name="document"{% if settings.read_only %} readonly="readonly"{% endif %}>{{ docString }}</textarea>
+  <br />
 
-  <div class="d-flex justify-content-between align-items-center">
+  <div>
     {% if !settings.read_only %}
       <input type="hidden" name="_method" value="put">
-      <button onclick="return onBackClick()" class="backButton btn">
-       <i class="fas fa-arrow-left"></i>
+      <button onclick="return onBackClick()" class="backButton btn btn-warning btn-large">
+        <i class="fa fa-arrow-left"></i>
         Back
       </button>
 
-      <button type="submit" class="btn btn-success" onclick="return onSubmitClick()">
-        <span class="glyphicon glyphicon-pencil"></span>
+      <button type="submit" class="btn btn-success btn-large float-end" onclick="return onSubmitClick()">
+        <i class="fa fa-save"></i>
         Save
       </button>
     {% else %}
-      <button onclick="return history.back()" class="btn">
-        <i class="fas fa-arrow-left"></i>
+      <button onclick="return history.back()" class="btn btn-warning btn-large btn-block">
+        <i class="fa fa-arrow-left"></i>
         Back
       </button>
     {% endif %}
@@ -124,21 +117,25 @@
 </form>
 
 {% if !settings.read_only && !settings.no_delete %}
+  <br>
+
   {% if document._id._bsontype == 'Binary' %}
   <form method="POST" action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}?subtype={{ document._id.sub_type }}">
+  {% elseif document._id._bsontype == 'Long' %}
+  <form method="POST" action="{{ collectionUrl }}/{{ document._id | longToString | safe | url_encode }}">
   {% else %}
   <form method="POST" action="{{ collectionUrl }}/{{ document._id | json | safe | url_encode }}">
   {% endif %}
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
     <input type="hidden" name="_method" value="delete">
-    <input type="submit" hidden />
-    <button class="btn btn-danger mt-3 deleteButtonDocument">
-      <i class="fas fa-trash"></i>
+    <button type="submit" class="btn btn-danger deleteButtonDocument">
+      <i class="fa fa-trash"></i>
       Delete
     </button>
   </form>
 
-  <div id="confirm-document-delete" class="modal fade" role="dialog" aria-labelledby="confirmDeletionDocumentLabel">
-    <div class="modal-dialog" role="document">
+  <div class="modal fade" id="confirm-document-delete" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-body">
           Are you sure?

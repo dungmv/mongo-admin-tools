@@ -1,39 +1,42 @@
-$primary: #41A948;
-// $border-radius: .5rem;
-$enable-rounded: false;
-
-@import "../../node_modules/line-awesome/dist/font-awesome-line-awesome/css/all.css";
-@import "../../node_modules/bootstrap/scss/bootstrap";
-
-main {
-  padding: 3rem 0;
-  min-height: 100vh;
+.tableWrapper {
+  cursor: pointer;
+  position: relative;
 }
 
-#indexes {
-  td {
-    vertical-align: middle;
-  }
-}
-
-.logo-nav img {
-  height: 25px;
-  width: 25px;
-  margin: 12px;
+.tableHeaderFooterBars {
+  border-top-color: #337ab7;
+  border-top-width: 5px;
+  border-top-style: solid;
+  border-bottom-color: #337ab7;
+  border-bottom-width: 5px;
+  border-bottom-style: solid;
 }
 
 .fadeToWhite {
-  background: -moz-linear-gradient(left,  rgba(255,255,255,0) 0%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(left,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to right,  rgba(255,255,255,0) 0%,rgba(255,255,255,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  background: -moz-linear-gradient(left, rgba(83, 80, 86, 0) 0%, rgba(83, 80, 86, 0.6) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(left, rgba(83, 80, 86, 0) 0%, rgba(83, 80, 86, 0.6) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to right, rgba(83, 80, 86, 0) 0%, rgba(83, 80, 86, 0.6) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   pointer-events: none;
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
-  margin-right: 0;
   z-index: 10;
   position: absolute;
   width: 75px;
   right: 0;
   height: 100%;
+}
+
+[data-bs-theme=dark] .fadeToWhite {
+  background: -moz-linear-gradient(left, rgba(83, 80, 86, 0) 0%, rgba(83, 80, 86, 1) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(left, rgba(83, 80, 86, 0) 0%, rgba(83, 80, 86, 1) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to right, rgba(83, 80, 86, 0) 0%, rgba(83, 80, 86, 1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+}
+
+.tableContent {
+  width: 100%;
+  height: auto;
+  display: table;
+  max-height: 100px;
+  max-width: 100%;
 }
 
 .CodeMirror pre {
@@ -48,9 +51,4 @@ main {
   -webkit-border-radius: 4px;
   border-radius: 4px; /* future proofing */
   -khtml-border-radius: 4px; /* for old Konqueror browsers */
-}
-
-.fa-ellipsis-v {
-  font-size: 1.3rem;
-  line-height: 1;
 }
